@@ -13,8 +13,8 @@ jobs:
 
       - name: Git config
         run: |
-          git config --local user.name "update-inflnigate"
-          git config --local user.email "update@inflnigate.com"
+          git config --global user.name "update-inflnigate"
+          git config --global user.email "update@inflnigate.com"
 
       - name: Read URLs from file
         run: |
