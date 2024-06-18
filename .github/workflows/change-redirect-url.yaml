@@ -11,16 +11,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Read URLs from file
-        run: |
-          # Replace with your script to read urls.txt into a variable
-          urls=$(<urls.txt)
-
       - name: Update index.html
         run: |
           # Replace with your script to update index.html
           # Example script:
           original_url=$(grep -o 'url=[^"]*' index.html | cut -d '=' -f 2)
+          urls=$(<urls.txt)
           IFS=, read -ra items <<< "$urls"
           random_url=$(shuf -n 1 -e "${items[@]}")
           echo $random_url
