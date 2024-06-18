@@ -11,6 +11,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Git config
+        run: |
+          git config --local user.name "update-inflnigate"
+          git config --local user.email "update@inflnigate.com"
+
       - name: Read URLs from file
         run: |
           # Replace with your script to read urls.txt into a variable
