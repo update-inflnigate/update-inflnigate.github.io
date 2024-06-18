@@ -1,0 +1,28 @@
+name: Update index.html every 5 minutes
+
+on:
+  schedule:
+    - cron: '*/1 * * * *'  # Runs every 1 minutes
+
+jobs:
+  update-html:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Read URLs from file
+        run: |
+          # Replace with your script to read urls.txt into a variable
+          urls=$(cat urls.txt)
+
+      - name: Update index.html
+        run: |
+          # Replace with your script to update index.html
+          # Example script:
+          original_url=$(grep -o 'url=[^"]*' index.html | cut -d '=' -f 2)
+          new_url=$(echo "$urls" | shuf -n 1)  # Select a random URL from the list
+          sed -i "s|redirect-url = .*|redirect-url = $new_url|g" index.html
+          git add index.html
+          git commit -m "Updated redirect-url in index.html"
+          git push
