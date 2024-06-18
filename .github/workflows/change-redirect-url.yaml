@@ -1,4 +1,4 @@
-name: Update index.html every 5 minutes
+name: Update index.html every 1 minutes
 
 on:
   schedule:
@@ -14,16 +14,32 @@ jobs:
       - name: Read URLs from file
         run: |
           # Replace with your script to read urls.txt into a variable
-          urls=$(cat urls.txt)
+          urls=$(<urls.txt)
+
       - name: Update index.html
         run: |
           # Replace with your script to update index.html
           # Example script:
           original_url=$(grep -o 'url=[^"]*' index.html | cut -d '=' -f 2)
-          new_url=$(echo "$urls" | shuf -n 1)  # Select a random URL from the list
-          sed -i "s|url=$original_url|url=$new_url|g" index.html
-          git config --local user.name "update-inflnigate"
-          git config --local user.email "update@inflnigate.com"
-          git add index.html
-          git commit -m "Updated redirect-url in index.html"
-          git push
+          IFS=, read -ra items <<< "$urls"
+          random_url=$(shuf -n 1 -e "${items[@]}")
+          echo $random_url
+          echo $original_url
+          sed -i "s|url=$original_url|url=$random_url|g" index.html
+          # Commit and push changes if there are modifications
+          # Check if there are changes to commit
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git config --local user.name "update-inflnigate"
+            git config --local user.email "update@inflnigate.com"
+            git add index.html
+            git commit -m "Update redirect-url in index.html"
+            
+            # Fetch changes from remote before pushing
+            git fetch
+            git rebase origin/main
+            
+            # Push changes
+            git push --set-upstream origin main
+          fi
