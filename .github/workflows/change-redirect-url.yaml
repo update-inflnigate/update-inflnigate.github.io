@@ -11,11 +11,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Git config
-        run: |
-          git config --local user.name "update-inflnigate"
-          git config --local user.email "update@inflnigate.com"
-
       - name: Read URLs from file
         run: |
           # Replace with your script to read urls.txt into a variable
@@ -28,6 +23,20 @@ jobs:
           original_url=$(grep -o 'url=[^"]*' index.html | cut -d '=' -f 2)
           new_url=$(echo "$urls" | shuf -n 1)  # Select a random URL from the list
           sed -i "s|url=$original_url|url=$new_url|g" index.html
-          git add index.html
-          git commit -m "Updated redirect-url in index.html"
-          git push
+          # Commit and push changes if there are modifications
+          # Check if there are changes to commit
+          if git diff-index --quiet HEAD --; then
+            echo "No changes to commit"
+          else
+            git config --local user.name "${GITHUB_ACTOR}"
+            git config --local user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+            git add index.html
+            git commit -m "Update redirect-url in index.html"
+            
+            # Fetch changes from remote before pushing
+            git fetch
+            git rebase origin/main
+            
+            # Push changes
+            git push --set-upstream origin main
+          fi
