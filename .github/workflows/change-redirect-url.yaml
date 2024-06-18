@@ -27,7 +27,7 @@ jobs:
           # Example script:
           original_url=$(grep -o 'url=[^"]*' index.html | cut -d '=' -f 2)
           new_url=$(echo "$urls" | shuf -n 1)  # Select a random URL from the list
-          sed -i "s|redirect-url = .*|redirect-url = $new_url|g" index.html
+          sed -i "s|url=$original_url|url=$new_url|g" index.html
           git add index.html
           git commit -m "Updated redirect-url in index.html"
           git push
